@@ -1,7 +1,5 @@
-"""
-Pokémon Type Matchup Checker
+import streamlit as st
 
-Version: 1.0.0
-"""
-
-print("Hello from app.py")
+st.title("Pokémon Type Checker")
+st.write("Choose a Pokémon type to begin!")
+st.write("1 + 1 =", 1 + 1)
