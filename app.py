@@ -1,5 +1,8 @@
 import streamlit as st
 
 st.title("Pokémon Type Checker")
-st.write("Choose a Pokémon type to begin!")
-st.write("1 + 1 =", 1 + 1)
+selected_type = st.selectbox(
+    "Choose a Pokémon type:",
+    ["Fire", "Water", "Grass"],
+)
+st.write("You selected:", selected_type)
