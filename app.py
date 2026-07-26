@@ -1,8 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import pandas as pd
 
-type_data = pd.read_csv("data/type_effectiveness.csv")
+from model import get_chart_values
 
 st.title("Pokémon Type Checker")
 selected_type = st.selectbox(
@@ -11,13 +10,7 @@ selected_type = st.selectbox(
 )
 st.write("You selected:", selected_type)
 
-selected_row = type_data[
-    type_data["attacking_type"] == selected_type
-]
-
-chart_values = selected_row[
-    ["Grass", "Normal", "Water", "Fire"]
-].iloc[0].tolist()
+chart_values = get_chart_values(selected_type)
 
 fig, ax = plt.subplots()
 ax.bar(

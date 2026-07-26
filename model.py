@@ -11,6 +11,25 @@ import pandas as pd
 
 DATA_FILE = Path(__file__).parent / "data" / "type_chart.csv"
 
+EFFECTIVENESS_FILE = (
+    Path(__file__).parent / "data" / "type_effectiveness.csv"
+)
+
+def load_effectiveness_data() -> pd.DataFrame:
+    """Load the simplified type-effectiveness data from the CSV file."""
+    return pd.read_csv(EFFECTIVENESS_FILE)
+
+def get_chart_values(selected_type: str) -> list:
+    """Return the chart values for the selected attacking type."""
+    type_data = load_effectiveness_data()
+
+    selected_row = type_data[
+        type_data["attacking_type"] == selected_type
+    ]
+
+    return selected_row[
+        ["Grass", "Normal", "Water", "Fire"]
+    ].iloc[0].tolist()
 
 def load_type_chart() -> pd.DataFrame:
     """
