@@ -62,6 +62,11 @@ def load_type_chart() -> pd.DataFrame:
 
     return chart
 
+def get_available_types() -> list[str]:
+    """Return all available Pokémon types in alphabetical order."""
+    chart = load_type_chart()
+
+    return sorted(chart["attacking_type"].unique().tolist())
 
 def get_matchup(attacking_type: str, defending_type: str) -> float:
     """
@@ -97,3 +102,97 @@ def get_matchup(attacking_type: str, defending_type: str) -> float:
         )
 
     return float(matching_rows.iloc[0]["multiplier"])
+
+def get_defensive_multiplier(
+    attacking_type: str,
+    defender_type_1: str,
+    defender_type_2: str | None = None,
+) -> float:
+    """Return the combined multiplier against one or two defender types."""
+    multiplier = get_matchup(attacking_type, defender_type_1)
+
+    if defender_type_2 is not None:
+        multiplier *= get_matchup(
+            attacking_type,
+            defender_type_2,
+        )
+
+    return multiplier
+
+def get_stab_multiplier(
+    attack_type: str,
+    attacker_type_1: str,
+    attacker_type_2: str | None = None,
+) -> float:
+    """Return the Generation I Same-Type Attack Bonus multiplier."""
+    attacker_types = [attacker_type_1, attacker_type_2]
+
+    if attack_type in attacker_types:
+        return 1.5
+
+    return 1.0
+
+def calculate_final_multiplier(
+    attack_type: str,
+    attacker_type_1: str,
+    defender_type_1: str,
+    attacker_type_2: str | None = None,
+    defender_type_2: str | None = None,
+) -> float:
+    """Return defensive effectiveness multiplied by STAB."""
+    defensive_multiplier = get_defensive_multiplier(
+        attack_type,
+        defender_type_1,
+        defender_type_2,
+    )
+
+    stab_multiplier = get_stab_multiplier(
+        attack_type,
+        attacker_type_1,
+        attacker_type_2,
+    )
+
+    return defensive_multiplier * stab_multiplier
+
+def get_calculation_breakdown(
+    attack_type: str,
+    attacker_type_1: str,
+    defender_type_1: str,
+    attacker_type_2: str | None = None,
+    defender_type_2: str | None = None,
+) -> dict:
+    """Return the individual multipliers used in the calculation."""
+    defender_1_multiplier = get_matchup(
+        attack_type,
+        defender_type_1,
+    )
+
+    defender_2_multiplier = None
+
+    if defender_type_2 is not None:
+        defender_2_multiplier = get_matchup(
+            attack_type,
+            defender_type_2,
+        )
+
+    defensive_multiplier = get_defensive_multiplier(
+        attack_type,
+        defender_type_1,
+        defender_type_2,
+    )
+
+    stab_multiplier = get_stab_multiplier(
+        attack_type,
+        attacker_type_1,
+        attacker_type_2,
+    )
+
+    final_multiplier = defensive_multiplier * stab_multiplier
+
+    return {
+        "defender_1_multiplier": defender_1_multiplier,
+        "defender_2_multiplier": defender_2_multiplier,
+        "defensive_multiplier": defensive_multiplier,
+        "stab_multiplier": stab_multiplier,
+        "final_multiplier": final_multiplier,
+    }
